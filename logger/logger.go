@@ -1,10 +1,15 @@
 package logger
 
 import (
+	"time"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("2006.01.02 15:04:05.000"))
+}
 
 func CreateLogger(logName string) *zap.Logger {
 	var infoLogSetting = lumberjack.Logger{
@@ -20,7 +25,7 @@ func CreateLogger(logName string) *zap.Logger {
 	errorLogSetting.Filename = "data/log/" + logName + "_error.log" 
 
 	var encoderConfig = zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeTime = timeEncoder 
 
 	var infoCore = zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderConfig),
